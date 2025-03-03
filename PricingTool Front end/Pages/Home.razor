@@ -1,7 +1,12 @@
 ﻿@page "/"
+@using PricingTool_Front_end.Models
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Pricing tool</h1>
 
-Welcome to your new app.
+
+<EditForm OnSubmit=@FetchSimilarAds>
+    <InputText Value=@Title></InputText>
+    <InputTextArea Value=@Description></InputTextArea>
+</EditForm> 
