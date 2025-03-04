@@ -8,4 +8,25 @@
     <InputText @bind-Value=@UsersAdd.Title></InputText>
     <InputTextArea @bind-Value=@UsersAdd.Descritpiton></InputTextArea>
     <button type="submit">Submit</button>
+    
+    @if (SimilarAds.Any())
+    {
+        <h4>Podobné inzeráty:</h4>
+        <ul>
+            @foreach (var ad in SimilarAds)
+            {
+                <li>
+                    <strong>@ad.Title</strong> - @ad.Price Kč
+                    <br>
+                    <a href="@ad.Url" target="_blank">Odkaz</a>
+                    <br>
+                    Skóre podobnosti: @ad.SimilarityScore
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Žádné podobné inzeráty nenalezeny.</p>
+    }
 </EditForm> 
