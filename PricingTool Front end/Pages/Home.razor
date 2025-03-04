@@ -1,12 +1,11 @@
 ﻿@page "/"
-@using PricingTool_Front_end.Models
 
 <PageTitle>Home</PageTitle>
 
 <h1>Pricing tool</h1>
 
-
-<EditForm OnSubmit=@FetchSimilarAds>
-    <InputText Value=@Title></InputText>
-    <InputTextArea Value=@Description></InputTextArea>
+<EditForm OnSubmit=@FetchSimilarAds Model="UsersAdd">
+    <InputText @bind-Value=@UsersAdd.Title></InputText>
+    <InputTextArea @bind-Value=@UsersAdd.Descritpiton></InputTextArea>
+    <button type="submit">Submit</button>
 </EditForm> 
