@@ -2,7 +2,7 @@
 
 public class UserAdd
 {
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
-    public string Descritpiton { get; set; }
+    public string? Descritpiton { get; set; }
 }

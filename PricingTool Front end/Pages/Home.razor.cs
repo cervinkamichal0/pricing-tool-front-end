@@ -1,22 +1,24 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using PricingTool_Front_end.Models;
 
 namespace PricingTool_Front_end.Pages
 {
-    partial class Home
+    public partial class Home
     {
-        [Inject] [NotNull] HttpClient? Http { get; set; }
-        private UserAdd UsersAdd { get; set; } = new();
-        private List<AdResponse> SimilarAds { get; set; } = new();
+        [Inject][NotNull] private HttpClient? Http { get; set; }
 
-        private async Task FetchSimilarAds()
+        protected UserAdd? UsersAdd { get; set; } = new();
+        protected List<AdResponse> SimilarAds { get; set; } = new();
+
+        protected async Task FetchSimilarAds()
         {
             var data = new Dictionary<string, string>
             {
                 { "title", UsersAdd.Title },
-                { "description", UsersAdd.Descritpiton }
+                { "description", UsersAdd.Descritpiton}
             };
 
             var response = await Http.PostAsJsonAsync("/similar_ads", data);
@@ -30,13 +32,17 @@ namespace PricingTool_Front_end.Pages
                 Console.WriteLine($"Chyba: {response.StatusCode}");
             }
         }
-    }
 
-    public class AdResponse
-    {
-        public string Title { get; set; } = string.Empty;
-        public int Price { get; set; }
-        public string Url { get; set; } = string.Empty;
-        public double SimilarityScore { get; set; }
+        private async Task HandleImageUpload(IBrowserFile file)
+        {
+            Console.WriteLine($"Nahrán obrázek: {file.Name}");
+        }
     }
+}
+public class AdResponse
+{
+    public string Title { get; set; } = string.Empty;
+    public int Price { get; set; }
+    public string Url { get; set; } = string.Empty;
+    public double SimilarityScore { get; set; }
 }

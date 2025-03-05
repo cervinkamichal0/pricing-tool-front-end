@@ -1,3 +1,7 @@
+:root {
+    --pill-border-radius: 40em; 
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -100,4 +104,8 @@ a, .btn-link {
 
 code {
     color: #c02d76;
+}
+
+.btn-primary {
+    border-radius: var(--pill-border-radius) !important;
 }
