@@ -35,10 +35,12 @@ namespace PricingTool_Front_end.Pages
 
         private async Task HandleImageUpload(IBrowserFile file)
         {
+            //TODO: implement
             Console.WriteLine($"Nahrán obrázek: {file.Name}");
         }
     }
 }
+//TODO: create seperate class
 public class AdResponse
 {
     public string Title { get; set; } = string.Empty;
