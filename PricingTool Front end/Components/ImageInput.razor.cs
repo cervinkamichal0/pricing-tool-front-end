@@ -12,6 +12,7 @@ public partial class ImageInput
     [Parameter]
     public string Height { get; set; } = "150px";
 
+    [Parameter]
     public string Width { get; set; } = "150px";
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
