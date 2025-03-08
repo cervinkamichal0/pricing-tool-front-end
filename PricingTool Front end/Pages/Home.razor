@@ -1,7 +1,7 @@
 ﻿@page "/"
 @using PricingTool_Front_end.Components
 
-<PageTitle>Nacenit</PageTitle>
+<PageTitle>PricingTool</PageTitle>
 
 <h1 class="text-center fw-bold">Co prodáváte?</h1>
 <EditForm OnSubmit="@FetchSimilarAds" Model="UsersAdd" class="card p-5 shadow-lg rounded-4" style="margin:2% 10%;">
@@ -24,17 +24,24 @@
             </div>
         </label>
 
+        <label class="fw-semibold">
+            <span>Obrázek:</span>
+            <div style="height:10%;">
+                <InputTextArea @bind-Value="UsersAdd.Descritpiton" class="form-control rounded-3" rows="3" />
+            </div>
+        </label>
+
         <button type="submit" class="btn btn-primary rounded-pill fs-5 fw-bold">Nacenit</button>
     </div>
 
 </EditForm>
 
-@if (SimilarAds.Any())
+@if (SimilarAdsResponse.SimilarAds.Any())
 {
     <div class="mt-5">
         <h2>Podobné inzeráty:</h2>
         <div class="list-group">
-            @foreach (var ad in SimilarAds)
+            @foreach (var ad in SimilarAdsResponse.SimilarAds)
             {
                 <a href="@ad.Url" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                     <div>

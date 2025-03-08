@@ -4,47 +4,40 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using PricingTool_Front_end.Models;
 
-namespace PricingTool_Front_end.Pages
+namespace PricingTool_Front_end.Pages;
+
+public partial class Home
 {
-    public partial class Home
+    [Inject][NotNull] private HttpClient? Http { get; set; }
+
+    protected UserAdd? UsersAdd { get; set; } = new();
+    protected SimilarAdsResponse SimilarAdsResponse { get; set; } = new();
+
+    protected async Task FetchSimilarAds()
     {
-        [Inject][NotNull] private HttpClient? Http { get; set; }
-
-        protected UserAdd? UsersAdd { get; set; } = new();
-        protected List<AdResponse> SimilarAds { get; set; } = new();
-
-        protected async Task FetchSimilarAds()
+        var data = new Dictionary<string, string>
         {
-            var data = new Dictionary<string, string>
-            {
-                { "title", UsersAdd.Title },
-                { "description", UsersAdd.Descritpiton}
-            };
+            { "title", UsersAdd.Title },
+            { "description", UsersAdd.Descritpiton}
+        };
 
-            var response = await Http.PostAsJsonAsync("/similar_ads", data);
+        var response = await Http.PostAsJsonAsync("/similar_ads", data);
 
-            if (response.IsSuccessStatusCode)
-            {
-                SimilarAds = await response.Content.ReadFromJsonAsync<List<AdResponse>>() ?? new();
-            }
-            else
-            {
-                Console.WriteLine($"Chyba: {response.StatusCode}");
-            }
+        if (response.IsSuccessStatusCode)
+        {
+            string json = await response.Content.ReadAsStringAsync();  
+
+            SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
         }
-
-        private async Task HandleImageUpload(IBrowserFile file)
+        else
         {
-            //TODO: implement
-            Console.WriteLine($"Nahrán obrázek: {file.Name}");
+            System.Diagnostics.Debug.WriteLine($"Chyba: {response.StatusCode}");
         }
     }
-}
-//TODO: create seperate class
-public class AdResponse
-{
-    public string Title { get; set; } = string.Empty;
-    public int Price { get; set; }
-    public string Url { get; set; } = string.Empty;
-    public double SimilarityScore { get; set; }
+
+    private async Task HandleImageUpload(IBrowserFile file)
+    {
+        //TODO: implement
+        Console.WriteLine($"Nahrán obrázek: {file.Name}");
+    }
 }
