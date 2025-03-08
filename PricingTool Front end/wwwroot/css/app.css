@@ -106,6 +106,3 @@ code {
     color: #c02d76;
 }
 
-.btn-primary {
-    border-radius: var(--pill-border-radius) !important;
-}

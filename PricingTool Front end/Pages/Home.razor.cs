@@ -10,34 +10,42 @@ public partial class Home
 {
     [Inject][NotNull] private HttpClient? Http { get; set; }
 
-    protected UserAdd? UsersAdd { get; set; } = new();
+    protected UserAdd UsersAdd { get; set; } = new();
     protected SimilarAdsResponse SimilarAdsResponse { get; set; } = new();
 
     protected async Task FetchSimilarAds()
     {
-        var data = new Dictionary<string, string>
+        if (UsersAdd.Image != null)
         {
-            { "title", UsersAdd.Title },
-            { "description", UsersAdd.Descritpiton}
-        };
+            MultipartFormDataContent content = new MultipartFormDataContent();
 
-        var response = await Http.PostAsJsonAsync("/similar_ads", data);
+            // Přidání textových dat (title, description)
+            content.Add(new StringContent(UsersAdd.Title), "title");
+            content.Add(new StringContent(UsersAdd.Descritpiton), "description");
 
-        if (response.IsSuccessStatusCode)
-        {
-            string json = await response.Content.ReadAsStringAsync();  
+            // Přidání souboru (obrázku)
+            var fileContent = new StreamContent(UsersAdd.Image.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // max 10 MB
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(UsersAdd.Image.ContentType);
+            content.Add(fileContent, "file", UsersAdd.Image.Name);
 
-            SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
-        }
-        else
-        {
-            System.Diagnostics.Debug.WriteLine($"Chyba: {response.StatusCode}");
+            // Odeslání dat na API
+            var response = await Http.PostAsync("/similar_ads", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
+                UsersAdd.Price = SimilarAdsResponse.EstimatedPrice;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {response.StatusCode}");
+            }
         }
     }
 
-    private async Task HandleImageUpload(IBrowserFile file)
+    private void HandleImageUpload(IBrowserFile file)
     {
-        //TODO: implement
-        Console.WriteLine($"Nahrán obrázek: {file.Name}");
+        UsersAdd.Image = file;
     }
 }
