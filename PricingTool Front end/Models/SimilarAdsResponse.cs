@@ -5,6 +5,9 @@ public class SimilarAdsResponse
     [JsonPropertyName("estimated_price")]
     public int? EstimatedPrice { get; set; }
 
+    [JsonPropertyName("estimated_quick_sale_price")]
+    public int QuickPrice { get; set; }
+
     [JsonPropertyName("similar_ads")]
     public List<AdResponse> SimilarAds { get; set; } = new();
 }

@@ -44,6 +44,8 @@ public partial class Home
         }
     }
 
+
+
     private void HandleImageUpload(IBrowserFile file)
     {
         UsersAdd.Image = file;

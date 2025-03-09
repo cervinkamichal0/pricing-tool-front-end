@@ -32,10 +32,10 @@
             </label>
 
             <div class="btn-group align-self-end" role="group">
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onchange="@(() => UsersAdd.Price = SimilarAdsResponse.EstimatedPrice)">
                 <label class="btn btn-outline-primary" for="btnradio1" style="border-bottom-left-radius:var(--pill-border-radius); border-top-left-radius:var(--pill-border-radius)">Nespěchám na prodej</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onchange="@(() => UsersAdd.Price = SimilarAdsResponse.QuickPrice)">
                 <label class="btn btn-outline-primary" for="btnradio2" style="border-bottom-right-radius:var(--pill-border-radius); border-top-right-radius:var(--pill-border-radius);">Spěchám na prodej</label>
             </div>
         </div>
