@@ -13,6 +13,8 @@ public partial class Home
     protected UserAdd UsersAdd { get; set; } = new();
     protected SimilarAdsResponse SimilarAdsResponse { get; set; } = new();
 
+    private bool PriceNotCalculated { get; set; } = true;
+
     protected async Task FetchSimilarAds()
     {
         if (UsersAdd.Image != null)
@@ -36,6 +38,7 @@ public partial class Home
                 string json = await response.Content.ReadAsStringAsync();
                 SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
                 UsersAdd.Price = SimilarAdsResponse.EstimatedPrice;
+                PriceNotCalculated = false;
             }
             else
             {
