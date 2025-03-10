@@ -19,6 +19,7 @@ public partial class Home
     {
         if (UsersAdd.Image != null)
         {
+            PriceNotCalculated = true;
             MultipartFormDataContent content = new MultipartFormDataContent();
 
             // Přidání textových dat (title, description)
