@@ -15,34 +15,70 @@ public partial class Home
 
     private bool PriceNotCalculated { get; set; } = true;
 
+    private string ErrorMessage { get; set; } = string.Empty;
+
+    private bool isErrorHidden { get; set; } = true;
+
+    private EditContext editContext;
+    private ValidationMessageStore messageStore;
+
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(UsersAdd);
+        messageStore = new ValidationMessageStore(editContext);
+    }
     protected async Task FetchSimilarAds()
     {
-        if (UsersAdd.Image != null)
+        if (!editContext.Validate())
         {
+            return; // Zastaví odeslání, pokud validace selže
+        }
+
+        if (UsersAdd.Image is not null && UsersAdd.Title is not null && UsersAdd.Description is not null)
+        {
+            isErrorHidden = true;
             MultipartFormDataContent content = new MultipartFormDataContent();
 
             // Přidání textových dat (title, description)
             content.Add(new StringContent(UsersAdd.Title), "title");
-            content.Add(new StringContent(UsersAdd.Descritpiton), "description");
+            content.Add(new StringContent(UsersAdd.Description), "description");
 
-            // Přidání souboru (obrázku)
-            var fileContent = new StreamContent(UsersAdd.Image.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // max 10 MB
-            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(UsersAdd.Image.ContentType);
-            content.Add(fileContent, "file", UsersAdd.Image.Name);
-
-            // Odeslání dat na API
-            var response = await Http.PostAsync("/similar_ads", content);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string json = await response.Content.ReadAsStringAsync();
-                SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
-                UsersAdd.Price = SimilarAdsResponse.EstimatedPrice;
-                PriceNotCalculated = false;
+                // Přidání souboru (obrázku)
+                var fileContent = new StreamContent(UsersAdd.Image.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // max 10 MB
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(UsersAdd.Image.ContentType);
+                content.Add(fileContent, "file", UsersAdd.Image.Name);
             }
-            else
+            catch
             {
-                System.Diagnostics.Debug.WriteLine($"Error: {response.StatusCode}");
+                ErrorMessage = "Nepodařilo se nahrát obrázek";
+                isErrorHidden = false;
+            }
+
+            try
+            {
+                // Odeslání dat na API
+                var response = await Http.PostAsync("/similar_ads", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
+                    UsersAdd.Price = SimilarAdsResponse.EstimatedPrice;
+                    PriceNotCalculated = false;
+                }
+                else
+                {
+                    ErrorMessage = "Na serveru došlo k chybě.";
+                    isErrorHidden = false;
+                }
+            }
+            catch 
+            {
+                ErrorMessage = "Na serveru došlo k chybě.";
+                isErrorHidden = false;
             }
         }
     }
