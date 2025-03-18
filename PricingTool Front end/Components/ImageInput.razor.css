@@ -1,19 +1,17 @@
 ﻿.image-uploader {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: start;
     gap: 10px;
 }
 
 .upload-label {
     display: flex;
-    justify-content: center;
-    align-items: center;
     border: 2px dashed #aaa;
-    border-radius: 10px;
     cursor: pointer;
     overflow: hidden;
     transition: 0.3s;
+    aspect-ratio:4/3;
 }
 
     .upload-label:hover {
