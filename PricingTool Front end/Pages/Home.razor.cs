@@ -19,8 +19,10 @@ public partial class Home
 
     private bool isErrorHidden { get; set; } = true;
 
-    private EditContext editContext;
-    private ValidationMessageStore messageStore;
+    private bool IsLoading { get; set; } = false;
+
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
 
 
     protected override void OnInitialized()
@@ -30,8 +32,10 @@ public partial class Home
     }
     protected async Task FetchSimilarAds()
     {
-        if (!editContext.Validate())
+        IsLoading = true;
+        if (editContext is not null && !editContext.Validate())
         {
+            IsLoading = false;
             return; // Zastaví odeslání, pokud validace selže
         }
 
@@ -55,6 +59,7 @@ public partial class Home
             {
                 ErrorMessage = "Nepodařilo se nahrát obrázek";
                 isErrorHidden = false;
+                IsLoading = false;
             }
 
             try
@@ -72,13 +77,18 @@ public partial class Home
                 else
                 {
                     ErrorMessage = "Na serveru došlo k chybě.";
+                    IsLoading = false;
                     isErrorHidden = false;
                 }
             }
-            catch 
+            catch ()
             {
                 ErrorMessage = "Na serveru došlo k chybě.";
                 isErrorHidden = false;
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
     }
