@@ -10,10 +10,10 @@ public partial class ImageInput
     private string? ImagePreviewUrl { get; set; }
 
     [Parameter]
-    public string Height { get; set; } = "auto";
+    public string MaxHeight { get; set; } = "auto";
 
     [Parameter]
-    public string Width { get; set; } = "auto";
+    public string MaxWidth { get; set; } = "auto";
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {

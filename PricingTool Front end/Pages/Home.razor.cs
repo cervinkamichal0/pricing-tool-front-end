@@ -81,7 +81,7 @@ public partial class Home
                     isErrorHidden = false;
                 }
             }
-            catch ()
+            catch
             {
                 ErrorMessage = "Na serveru došlo k chybě.";
                 isErrorHidden = false;
