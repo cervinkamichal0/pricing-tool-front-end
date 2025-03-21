@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using PricingTool_Front_end.Models;
+using System.Text.Json;
 
 namespace PricingTool_Front_end.Pages;
 
@@ -19,25 +20,13 @@ public partial class Home
 
     private bool isErrorHidden { get; set; } = true;
 
-    private bool IsLoading { get; set; } = false;
+    private bool IsPriceLoading { get; set; } = false;
 
-    private EditContext? editContext;
-    private ValidationMessageStore? messageStore;
+    private bool IsDescriptionLoading { get; set; } = false;
 
-
-    protected override void OnInitialized()
-    {
-        editContext = new EditContext(UsersAdd);
-        messageStore = new ValidationMessageStore(editContext);
-    }
     protected async Task FetchSimilarAds()
     {
-        IsLoading = true;
-        if (editContext is not null && !editContext.Validate())
-        {
-            IsLoading = false;
-            return; // Zastaví odeslání, pokud validace selže
-        }
+        IsPriceLoading = true;
 
         if (UsersAdd.Image is not null && UsersAdd.Title is not null && UsersAdd.Description is not null)
         {
@@ -59,7 +48,7 @@ public partial class Home
             {
                 ErrorMessage = "Nepodařilo se nahrát obrázek";
                 isErrorHidden = false;
-                IsLoading = false;
+                IsPriceLoading = false;
             }
 
             try
@@ -77,7 +66,7 @@ public partial class Home
                 else
                 {
                     ErrorMessage = "Na serveru došlo k chybě.";
-                    IsLoading = false;
+                    IsPriceLoading = false;
                     isErrorHidden = false;
                 }
             }
@@ -88,12 +77,43 @@ public partial class Home
             }
             finally
             {
-                IsLoading = false;
+                IsPriceLoading = false;
             }
         }
     }
 
+    private async Task suggest_description()
+    {
+        if (UsersAdd.Title is not null && UsersAdd.Title.Length > 0)
+        {
+            IsDescriptionLoading = true;
+            try
+            {
+                MultipartFormDataContent content = new MultipartFormDataContent();
 
+                // Přidání textových dat (title, description)
+                content.Add(new StringContent(UsersAdd.Title), "title");
+
+                var response = await Http.PostAsync("/generate_description", content);
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonString = await response.Content.ReadAsStringAsync();
+                    UsersAdd.Description = JsonSerializer.Deserialize<string>(jsonString) ?? "";
+                }
+            }
+            catch
+            {
+                ErrorMessage = "Na serveru došlo k chybě.";
+                isErrorHidden = false;
+            }
+            finally
+            {
+                IsDescriptionLoading = false;
+            }
+        }
+    }
 
     private void HandleImageUpload(IBrowserFile file)
     {
