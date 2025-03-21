@@ -1,5 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
+/// <summary>
+/// Datövý model pro opověď api endpoint /similar_ads
+/// </summary>
 public class SimilarAdsResponse
 {
     [JsonPropertyName("estimated_price")]
@@ -12,6 +15,9 @@ public class SimilarAdsResponse
     public List<AdResponse> SimilarAds { get; set; } = new();
 }
 
+/// <summary>
+/// Datový model pro inzerát z odpovědi z api endpoint /similar_ads
+/// </summary>
 public class AdResponse
 {
     [JsonPropertyName("title")]

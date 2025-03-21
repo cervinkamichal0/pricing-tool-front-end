@@ -11,7 +11,7 @@ public partial class Home
 {
     [Inject][NotNull] private HttpClient? Http { get; set; }
 
-    protected UserAdd UsersAdd { get; set; } = new();
+    protected UserAdd FormUsersAdd { get; set; } = new();
     protected SimilarAdsResponse SimilarAdsResponse { get; set; } = new();
 
     private bool PriceNotCalculated { get; set; } = true;
@@ -24,25 +24,29 @@ public partial class Home
 
     private bool IsDescriptionLoading { get; set; } = false;
 
+    /// <summary>
+    /// Naplní <see cref="SimilarAdsResponse"/> daty z similar_ads api endpointu a <see cref="FormUsersAdd.Price"/> vypočítanou cenou
+    /// </summary>
     protected async Task FetchSimilarAds()
     {
+        //Zobazí v tlačítku indikaci čekání na data
         IsPriceLoading = true;
 
-        if (UsersAdd.Image is not null && UsersAdd.Title is not null && UsersAdd.Description is not null)
+        if (FormUsersAdd.Image is not null && FormUsersAdd.Title is not null && FormUsersAdd.Description is not null)
         {
             isErrorHidden = true;
             MultipartFormDataContent content = new MultipartFormDataContent();
 
             // Přidání textových dat (title, description)
-            content.Add(new StringContent(UsersAdd.Title), "title");
-            content.Add(new StringContent(UsersAdd.Description), "description");
+            content.Add(new StringContent(FormUsersAdd.Title), "title");
+            content.Add(new StringContent(FormUsersAdd.Description), "description");
 
             try
             {
                 // Přidání souboru (obrázku)
-                var fileContent = new StreamContent(UsersAdd.Image.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // max 10 MB
-                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(UsersAdd.Image.ContentType);
-                content.Add(fileContent, "file", UsersAdd.Image.Name);
+                var fileContent = new StreamContent(FormUsersAdd.Image.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)); // max 10 MB
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(FormUsersAdd.Image.ContentType);
+                content.Add(fileContent, "file", FormUsersAdd.Image.Name);
             }
             catch
             {
@@ -58,9 +62,10 @@ public partial class Home
 
                 if (response.IsSuccessStatusCode)
                 {
+                    //Deserializace dat z api
                     string json = await response.Content.ReadAsStringAsync();
-                    SimilarAdsResponse = System.Text.Json.JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
-                    UsersAdd.Price = SimilarAdsResponse.EstimatedPrice;
+                    SimilarAdsResponse = JsonSerializer.Deserialize<SimilarAdsResponse>(json) ?? new SimilarAdsResponse();
+                    FormUsersAdd.Price = SimilarAdsResponse.EstimatedPrice;
                     PriceNotCalculated = false;
                 }
                 else
@@ -82,25 +87,28 @@ public partial class Home
         }
     }
 
+    /// <summary>
+    /// Naplní <see cref="FormUsersAdd.Description"/> strukturou popisu z /generate_description api endpointu
+    /// </summary>
     private async Task suggest_description()
     {
-        if (UsersAdd.Title is not null && UsersAdd.Title.Length > 0)
+        if (FormUsersAdd.Title is not null && FormUsersAdd.Title.Length > 0)
         {
             IsDescriptionLoading = true;
             try
             {
                 MultipartFormDataContent content = new MultipartFormDataContent();
 
-                // Přidání textových dat (title, description)
-                content.Add(new StringContent(UsersAdd.Title), "title");
+                // Přidání textových dat (title)
+                content.Add(new StringContent(FormUsersAdd.Title), "title");
 
                 var response = await Http.PostAsync("/generate_description", content);
 
-
                 if (response.IsSuccessStatusCode)
                 {
+                    //Deserrializace dat z api
                     string jsonString = await response.Content.ReadAsStringAsync();
-                    UsersAdd.Description = JsonSerializer.Deserialize<string>(jsonString) ?? "";
+                    FormUsersAdd.Description = JsonSerializer.Deserialize<string>(jsonString) ?? "";
                 }
             }
             catch
@@ -115,8 +123,12 @@ public partial class Home
         }
     }
 
+    /// <summary>
+    /// Naplní <see cref="FormUsersAdd.Image"/> obrázkem, který uživatel nahrál.
+    /// </summary>
+    /// <param name="file">Obrázek, který se má uložit do <see cref="FormUsersAdd.Image"/></param>
     private void HandleImageUpload(IBrowserFile file)
     {
-        UsersAdd.Image = file;
+        FormUsersAdd.Image = file;
     }
 }
