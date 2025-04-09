@@ -90,7 +90,7 @@ public partial class Home
     /// <summary>
     /// Naplní <see cref="FormUsersAdd.Description"/> strukturou popisu z /generate_description api endpointu
     /// </summary>
-    private async Task suggest_description()
+    private async Task SuggestDescription()
     {
         if (FormUsersAdd.Title is not null && FormUsersAdd.Title.Length > 0)
         {
