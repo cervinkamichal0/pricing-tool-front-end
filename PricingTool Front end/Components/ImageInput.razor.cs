@@ -22,7 +22,7 @@ public partial class ImageInput
         if (file != null)
         {
             var buffer = new byte[file.Size];
-            await file.OpenReadStream().ReadAsync(buffer);
+            await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).ReadAsync(buffer);
             ImagePreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
 
             await OnImageSelected.InvokeAsync(file);
