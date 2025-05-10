@@ -22,7 +22,7 @@
             <div class="hstack">
                 <span>Popis:</span>
                 <!--Tlačítko pro generování popisu s indikací čekání na výsledek-->
-                @if(!IsDescriptionLoading)
+                @if (!IsDescriptionLoading)
                 {
                     <button class="ms-auto btn btn-primary rounded-3" @onclick="SuggestDescription" type="button">
                         <!--ikonka hvězdiček-->
@@ -97,19 +97,5 @@
 <!--Zobrazení nejpodobnějších inzerátů-->
 @if (SimilarAdsResponse.SimilarAds.Any())
 {
-    <div class="card p-5 shadow-lg rounded-3 mx-auto mt-4" style="max-width: 800px;">
-        <h2>Podobné inzeráty:</h2>
-        <div class="list-group">
-            @foreach (var ad in SimilarAdsResponse.SimilarAds)
-            {
-                <a href="@ad.Url" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center flex-column flex-md-row">
-                    <div class="text-center text-md-start">
-                        <h5 class="mb-1">@ad.Title</h5>
-                        <small class="text-muted">Podobnost: @Math.Round((ad.SimilarityScore * 100), 1)%</small>
-                    </div>
-                    <span class="badge bg-primary rounded-pill">@ad.Price Kč</span>
-                </a>
-            }
-        </div>
-    </div>
+    <AdsDisplay AdsResponse="SimilarAdsResponse"></AdsDisplay>
 }
